@@ -2,6 +2,11 @@ const BLOCK_SIZE = 20;
 const DIMEN = 600
 const N_BLOCKS = Math.floor(DIMEN / BLOCK_SIZE);
 let snake;
+let score = 0;
+let snakeDirection = {
+  x: 1,
+  y: 0
+};
 
 let food;
 
@@ -16,7 +21,10 @@ function draw() {
   background(22, 33, 62);
   snake.update();
   snake.draw();
+  snake.checkCollision();
+  snake.setDirection(snakeDirection);
   if (snake.consume(food)) {
+    score += 1;
     while (true) {
       let flag = 0;
       food = generateCoordinates();
@@ -29,19 +37,37 @@ function draw() {
       if (flag == 0)
         break;
     }
+    console.clear();
+    console.log("Score:" + score);
   }
   drawFood(food);
 }
 
 function keyPressed() {
   if (keyCode === UP_ARROW && snake.speed.y === 0) 
-    snake.setDirection(0, -1);
+    // snake.setDirection(0, -1);
+    snakeDirection = {
+      x: 0,
+      y: -1
+    }
   else if (keyCode === DOWN_ARROW && snake.speed.y === 0)
-    snake.setDirection(0, 1);
+    // snake.setDirection(0, 1);
+    snakeDirection = {
+      x: 0,
+      y: 1
+    }
   else if (keyCode === RIGHT_ARROW && snake.speed.x === 0)
-    snake.setDirection(1, 0);
+    // snake.setDirection(1, 0);
+    snakeDirection = {
+      x: 1,
+      y: 0
+    }
   else if (keyCode === LEFT_ARROW && snake.speed.x === 0)
-    snake.setDirection(-1, 0);
+    // snake.setDirection(-1, 0);
+    snakeDirection = {
+      x: -1,
+      y: 0
+    }
 }
 
 function generateCoordinates() {
@@ -119,10 +145,20 @@ class Snake {
   }
 
   // +ve value reresents down/right
-  setDirection(x, y) {
-    this.speed = {
-      x,
-      y
+  setDirection(snakeDirection) {
+    if (snakeDirection.x !== 0 && this.speed.x === 0)
+      this.speed = snakeDirection;
+    else if (snakeDirection.y !== 0 && this.speed.y === 0)
+      this.speed = snakeDirection;
+  }
+
+  checkCollision() {
+    for (let i = 1; i < this.tail.length; ++i) {
+      if (this.tail[0].x === this.tail[i].x && this.tail[0].y === this.tail[i].y) {
+        console.log("GAME OVER!");
+        noLoop();
+        break;
+      }
     }
   }
 
